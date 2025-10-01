@@ -1,6 +1,6 @@
 ﻿namespace EventMasters.Models
 {
-    public class Categories
+    public class Category
     {
         public int CategoryId { get; set; }
 

@@ -1,4 +1,9 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using EventMasters.Data;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<EventMastersContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("EventMastersContext") ?? throw new InvalidOperationException("Connection string 'EventMastersContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
