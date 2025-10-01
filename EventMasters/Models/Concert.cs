@@ -13,7 +13,7 @@ namespace EventMasters.Models
 
         public string Description { get; set; } = string.Empty;
 
-        public DateTime DateAdded { get; set; }
+        public DateTime DateAdded { get; set; } = DateTime.Now;
 
         public DateTime EventDate { get; set; }
 
