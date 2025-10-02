@@ -1,5 +1,35 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<EventMasters.Models.Concert>
+@{
+    ViewData["Title"] = "Home";
 }
 
-<h1>Event Masters</h1>
+<h1>Upcoming & Newest</h1>
+<p><a class="btn btn-primary" asp-controller="Concerts" asp-action="Create">Add Event</a></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Date/Time</th>
+            <th>Location</th>
+            <th>Category</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Title</td>
+                <td>@c.EventDate.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@c.Location</td>
+                <td>@c.Category</td>
+                <td>
+                    <a asp-controller="Concerts" asp-action="Details" asp-route-id="@c.ConcertId">Details</a> |
+                    <a asp-controller="Concerts" asp-action="Edit" asp-route-id="@c.ConcertId">Edit</a> |
+                    <a asp-controller="Concerts" asp-action="Delete" asp-route-id="@c.ConcertId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

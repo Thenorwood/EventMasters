@@ -21,11 +21,14 @@ namespace EventMasters.Controllers
         }
 
         //Get: Concerts
+        // GET: Home/Index
         public async Task<IActionResult> Index()
         {
-            
+            var concerts = await _context.Concert
+                .OrderByDescending(c => c.DateAdded)   
+                .ToListAsync();
 
-            return View();
+            return View(concerts);                     
         }
 
         //gGET: Concerts/Details/5
@@ -51,5 +54,7 @@ namespace EventMasters.Controllers
             
             return View(concert);
         }
+
+       
     }
 }

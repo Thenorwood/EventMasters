@@ -13,6 +13,10 @@ namespace EventMasters.Models
 
         public string Description { get; set; } = string.Empty;
 
+        public string Location { get; set; } = string.Empty;
+
+        public string Owner { get; set; } = string.Empty;
+
         public DateTime DateAdded { get; set; } = DateTime.Now;
 
         public DateTime EventDate { get; set; }
