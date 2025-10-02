@@ -19,8 +19,15 @@ namespace EventMasters.Controllers
             _context = context;
         }
 
+        // GET: /Concerts
+        public async Task<IActionResult> Index()
+        {
+            var concerts = await _context.Concert.ToListAsync();
+            return View(concerts);
+        }
 
-        
+
+
 
         // GET: Concerts/Create
         public IActionResult Create()
@@ -101,6 +108,24 @@ namespace EventMasters.Controllers
             return View(concert);
         }
 
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var concert = await _context.Concert
+                .FirstOrDefaultAsync(m => m.ConcertId == id);
+
+            if (concert == null)
+            {
+                return NotFound();
+            }
+
+            return View(concert);
+        }
+
         // GET: Concerts/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -134,6 +159,8 @@ namespace EventMasters.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Index", "Home");
         }
+
+
 
         private bool ConcertExists(int id)
         {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using EventMasters.Models;
 using System.Threading.Tasks;
 using EventMasters.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventMasters.Controllers
 {
@@ -37,7 +38,7 @@ namespace EventMasters.Controllers
             }
 
             //get record when Prim Key = id
-            var concert = await _context.Concert.FirstOrDefaultAsync(mbox => mbox.ConcertID == id);
+            var concert = await _context.Concert.FirstOrDefaultAsync(mbox => mbox.ConcertId == id);
             
             //record not found in database
             if(concert == null)
