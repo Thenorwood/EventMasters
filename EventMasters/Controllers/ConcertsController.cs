@@ -19,6 +19,17 @@ namespace EventMasters.Controllers
             _context = context;
         }
 
+        // to create a dropdown menu
+        private void PopulateCategoryList()
+        {
+            var cats = _context.Category        
+                         .OrderBy(c => c.Name)  
+                         .ToList();
+
+            ViewBag.NoCategories = !cats.Any();
+            ViewBag.CategoryList = new SelectList(cats, "CategoryId", "Name"); // or "Title" if you use that
+        }
+
         // GET: /Concerts
         public async Task<IActionResult> Index()
         {
@@ -32,27 +43,48 @@ namespace EventMasters.Controllers
         // GET: Concerts/Create
         public IActionResult Create()
         {
+
+            ViewBag.CategoryList = new SelectList(
+                _context.Set<Category>().OrderBy(c => c.Name).ToList(),
+                "CategoryId",   // value
+                "Name"          // text shown in dropdown
+        );
+
             return View();
         }
 
         // POST: Concerts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ConcertId,Title,Description,DateAdded,EventDate,Category")] Concert concert)
+        public async Task<IActionResult> Create([Bind("ConcertId,Title,Description,DateAdded,EventDate,Category")] Concert concert,
+            int? CategoryId
+            )
         {
             //marks this as added today
             concert.DateAdded = DateTime.Now;
 
+
+            // If a category was chosen, attach it (no model change needed)
+            if (CategoryId.HasValue)
+            {
+                var cat = await _context.Category.FindAsync(CategoryId.Value);
+                if (cat != null) concert.Category = cat.Name;
+            }
+
+
             if (ModelState.IsValid)
             {
                 _context.Add(concert);
-
                 await _context.SaveChangesAsync();
-
                 return RedirectToAction("Index", "Home");
             }
+
+            // rebuild dropdown on error
+            ViewBag.CategoryList = new SelectList(
+                _context.Set<Category>().OrderBy(c => c.Name).ToList(),
+                "CategoryId", "Name", CategoryId
+            );
             return View(concert);
         }
 
@@ -74,8 +106,7 @@ namespace EventMasters.Controllers
         }
 
         // POST: Concerts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ConcertId,Title,Description,DateAdded,EventDate,Category")] Concert concert)

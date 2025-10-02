@@ -34,11 +34,10 @@ namespace EventMasters.Controllers
         }
 
         // POST: Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CategoryId,Title,Type")] Category category)
+        public async Task<IActionResult> Create([Bind("CategoryId,Name,Description")] Category category)
         {
             if (ModelState.IsValid)
             {
@@ -66,11 +65,10 @@ namespace EventMasters.Controllers
         }
 
         // POST: Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,Title,Type")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("CategoryId,Name,Description")] Category category)
         {
             if (id != category.CategoryId)
             {
