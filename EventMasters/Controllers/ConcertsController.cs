@@ -19,7 +19,7 @@ namespace EventMasters.Controllers
             _context = context;
         }
 
-        // to create a dropdown menu
+        // to create a dropdown menu//helper method
         private void PopulateCategoryList()
         {
             var cats = _context.Category        
@@ -27,14 +27,14 @@ namespace EventMasters.Controllers
                          .ToList();
 
             ViewBag.NoCategories = !cats.Any();
-            ViewBag.CategoryList = new SelectList(cats, "CategoryId", "Name"); // or "Title" if you use that
+            ViewBag.CategoryList = new SelectList(cats, "CategoryId", "Name"); // or "Title" if you use that. this is the little dropdown
         }
 
         // GET: /Concerts
         public async Task<IActionResult> Index()
         {
-            var concerts = await _context.Concert.ToListAsync();
-            return View(concerts);
+            var concerts = await _context.Concert.ToListAsync();//loads into index async
+            return View(concerts);//runs when you visit concerts
         }
 
 
@@ -44,7 +44,7 @@ namespace EventMasters.Controllers
         public IActionResult Create()
         {
 
-            ViewBag.CategoryList = new SelectList(
+            ViewBag.CategoryList = new SelectList( //builds the category dropdown
                 _context.Set<Category>().OrderBy(c => c.Name).ToList(),
                 "CategoryId",   // value
                 "Name"          // text shown in dropdown
@@ -57,7 +57,7 @@ namespace EventMasters.Controllers
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ConcertId,Title,Description,DateAdded,EventDate,Category")] Concert concert,
+        public async Task<IActionResult> Create([Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category")] Concert concert,
             int? CategoryId
             )
         {
@@ -73,7 +73,7 @@ namespace EventMasters.Controllers
             }
 
 
-            if (ModelState.IsValid)
+            if (ModelState.IsValid)//checks validation
             {
                 _context.Add(concert);
                 await _context.SaveChangesAsync();
@@ -109,7 +109,7 @@ namespace EventMasters.Controllers
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ConcertId,Title,Description,DateAdded,EventDate,Category")] Concert concert)
+        public async Task<IActionResult> Edit(int id, [Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category")] Concert concert)
         {
             if (id != concert.ConcertId)
             {

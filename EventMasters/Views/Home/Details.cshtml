@@ -37,9 +37,24 @@
         @Html.DisplayFor(m => m.Category)
     </dd>
 
+    <dt class="col-sm-10">
+        @Html.DisplayNameFor(m =>m.Location)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(m => m.Location)
+    </dd>
+
+    <dt class="col-sm-10">
+        @Html.DisplayNameFor(m => m.Owner)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(m => m.Owner)
+    </dd>
+    
+
     <dt class="col-sm-2">
-        @Html.DisplayNameFor(m => m.EventDate
-   )</dt>
+        @Html.DisplayNameFor(m => m.EventDate)
+     </dt>
 
     <dd class="col-sm-10">
         @Model.EventDate.ToString("yyyy-MM-dd HH:mm")
