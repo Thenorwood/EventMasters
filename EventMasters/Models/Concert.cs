@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EventMasters.Models
 {
@@ -23,8 +24,13 @@ namespace EventMasters.Models
 
         public string Category { get; set; } = string.Empty;
 
+
         //nav property
         public List<Category>? Categories { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Image")]
+        public IFormFile? ImageFile { get; set; } //nullable, dont need photo
 
 
 

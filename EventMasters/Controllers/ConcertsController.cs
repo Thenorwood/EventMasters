@@ -57,7 +57,7 @@ namespace EventMasters.Controllers
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category")] Concert concert,
+        public async Task<IActionResult> Create([Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category,ImageFile")] Concert concert,
             int? CategoryId
             )
         {
@@ -109,7 +109,7 @@ namespace EventMasters.Controllers
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category")] Concert concert)
+        public async Task<IActionResult> Edit(int id, [Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category,ImageFile")] Concert concert)
         {
             if (id != concert.ConcertId)
             {
