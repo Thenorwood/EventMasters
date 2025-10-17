@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +7,7 @@ using EventMasters.Models;
 
 namespace EventMasters.Controllers
 {
+    [Authorize] //restricted accwess
     public class ConcertsController : Controller
     {
         private readonly EventMastersContext _context;
@@ -75,6 +73,29 @@ namespace EventMasters.Controllers
 
             if (ModelState.IsValid)//checks validation
             {
+
+                // MERGE STEP 3: add his file-upload logic (adapted to your model)
+                if (concert.ImageFile != null)
+                {
+                    // ensure you have: using System.IO; and a string? ImageFilename prop on Concert
+                    string filename = Guid.NewGuid().ToString() + Path.GetExtension(concert.ImageFile.FileName);
+
+                    // save filename in DB model (not bound from client)
+                    concert.Filename = filename;   // <-- make sure Concert has this property
+
+                    // choose a folder; match your app (use "photos" if you want to mirror his)
+                    string saveFilePath = Path.Combine(
+                        Directory.GetCurrentDirectory(), "wwwroot", "photos", filename
+                    );
+
+                    // create directory if it doesn’t exist (handy in fresh projects)
+                    Directory.CreateDirectory(Path.GetDirectoryName(saveFilePath)!);
+
+                    using (var fileStream = new FileStream(saveFilePath, FileMode.Create))
+                    {
+                        await concert.ImageFile.CopyToAsync(fileStream);
+                    }
+                }
                 _context.Add(concert);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Home");

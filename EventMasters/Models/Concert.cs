@@ -22,6 +22,8 @@ namespace EventMasters.Models
 
         public DateTime EventDate { get; set; }
 
+        public string Filename { get; set; } = string.Empty;//added this so form will work
+
         public string Category { get; set; } = string.Empty;
 
 

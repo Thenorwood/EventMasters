@@ -4,11 +4,15 @@ using EventMasters.Models;
 using System.Threading.Tasks;
 using EventMasters.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace EventMasters.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
+        
         private readonly ILogger<HomeController> _logger;
         private readonly EventMastersContext _context;
 
