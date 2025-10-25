@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using EventMasters.Data;
+using EventMasters.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EventMasters.Data;
-using EventMasters.Models;
+using System.Configuration;
 
 namespace EventMasters.Controllers
 {
@@ -11,10 +14,18 @@ namespace EventMasters.Controllers
     public class ConcertsController : Controller
     {
         private readonly EventMastersContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly BlobContainerClient _containerClient;
 
-        public ConcertsController(EventMastersContext context)
+
+        public ConcertsController(EventMastersContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+
+            var connectionString = _configuration["AzureStorage"];
+            var containerName = "eventmaster-uploads";
+            _containerClient = new BlobContainerClient(connectionString, containerName);
         }
 
         // to create a dropdown menu//helper method
@@ -77,6 +88,9 @@ namespace EventMasters.Controllers
                 // MERGE STEP 3: add his file-upload logic (adapted to your model)
                 if (concert.ImageFile != null)
                 {
+                    //
+                    //upload file to blob storage
+                    //
                     // ensure you have: using System.IO; and a string? ImageFilename prop on Concert
                     string filename = Guid.NewGuid().ToString() + Path.GetExtension(concert.ImageFile.FileName);
 

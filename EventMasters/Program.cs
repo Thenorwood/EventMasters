@@ -20,6 +20,14 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
+//
+/********** Add user secrets (to store username and password) *************/
+//
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
