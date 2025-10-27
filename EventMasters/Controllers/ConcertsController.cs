@@ -2,6 +2,7 @@
 using Azure.Storage.Blobs.Models;
 using EventMasters.Data;
 using EventMasters.Models;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -63,12 +64,13 @@ namespace EventMasters.Controllers
         }
 
         // POST: Concerts/Create
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category,ImageFile")] Concert concert,
-            int? CategoryId
-            )
+        public async Task<IActionResult> Create(
+        [Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category,ImageFile")] Concert concert,
+        int? CategoryId)
+            
         {
             //marks this as added today
             concert.DateAdded = DateTime.Now;
@@ -82,34 +84,37 @@ namespace EventMasters.Controllers
             }
 
 
-            if (ModelState.IsValid)//checks validation
+            if (ModelState.IsValid)//check validation
             {
 
-                // MERGE STEP 3: add his file-upload logic (adapted to your model)
                 if (concert.ImageFile != null)
                 {
-                    //
-                    //upload file to blob storage
-                    //
-                    // ensure you have: using System.IO; and a string? ImageFilename prop on Concert
-                    string filename = Guid.NewGuid().ToString() + Path.GetExtension(concert.ImageFile.FileName);
+                    string blobName = Guid.NewGuid().ToString() + "_" + concert.ImageFile.FileName;
 
-                    // save filename in DB model (not bound from client)
-                    concert.Filename = filename;   // <-- make sure Concert has this property
+                    //blob client for that file
+                    var blobClient = _containerClient.GetBlobClient(blobName);
 
-                    // choose a folder; match your app (use "photos" if you want to mirror his)
-                    string saveFilePath = Path.Combine(
-                        Directory.GetCurrentDirectory(), "wwwroot", "photos", filename
-                    );
-
-                    // create directory if it doesn’t exist (handy in fresh projects)
-                    Directory.CreateDirectory(Path.GetDirectoryName(saveFilePath)!);
-
-                    using (var fileStream = new FileStream(saveFilePath, FileMode.Create))
+                    //Upload to Blob
+                    using (var stream = concert.ImageFile.OpenReadStream())
                     {
-                        await concert.ImageFile.CopyToAsync(fileStream);
+                        await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = concert.ImageFile.ContentType });
                     }
+                    concert.Filename = blobClient.Uri.ToString();
                 }
+
+                    
+                //    string saveFilePath = Path.Combine(
+                //        Directory.GetCurrentDirectory(), "wwwroot", "photos", filename
+                //    );
+
+                //    // create directory if it doesn’t exist (handy in fresh projects)
+                //    Directory.CreateDirectory(Path.GetDirectoryName(saveFilePath)!);
+
+                //    using (var fileStream = new FileStream(saveFilePath, FileMode.Create))
+                //    {
+                //        await concert.ImageFile.CopyToAsync(fileStream);
+                //    }
+                //}
                 _context.Add(concert);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Home");
@@ -120,6 +125,7 @@ namespace EventMasters.Controllers
                 _context.Set<Category>().OrderBy(c => c.Name).ToList(),
                 "CategoryId", "Name", CategoryId
             );
+
             return View(concert);
         }
 

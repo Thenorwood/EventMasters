@@ -21,6 +21,9 @@
         @foreach (var c in Model)
         {
             <tr>
+                <th>
+                    <img src="@c.Filename" alt="@c.Title" class="thumbnail" />
+                </th>
                 <td>@c.Title</td>
                 <td>@c.EventDate.ToString("yyyy-MM-dd HH:mm")</td>
                 <td>@c.Owner</td>
