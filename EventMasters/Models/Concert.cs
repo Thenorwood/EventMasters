@@ -12,11 +12,11 @@ namespace EventMasters.Models
 
         public string Title { get; set; } = string.Empty;
 
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
 
         public string Location { get; set; } = string.Empty;
 
-        public string Owner { get; set; } = string.Empty;
+        public string? Owner { get; set; } = string.Empty;
 
         public DateTime DateAdded { get; set; } = DateTime.Now;
 
@@ -24,7 +24,7 @@ namespace EventMasters.Models
 
         public string Filename { get; set; } = string.Empty;//added this so form will work
 
-        public string Category { get; set; } = string.Empty;
+        public string? Category { get; set; } = string.Empty;
 
 
         //nav property

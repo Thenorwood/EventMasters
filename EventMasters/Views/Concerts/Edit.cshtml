@@ -34,6 +34,35 @@
                 <input asp-for="Category" class="form-control" />
                 <span asp-validation-for="Category" class="text-danger"></span>
             </div>
+
+            @*for showing the image, editing, and deleting *@
+            @if (!string.IsNullOrEmpty(Model.Filename))
+            {
+                <div class="mb-3">
+                    <label>Current Image</label><br />
+                    <img src="@Model.Filename" alt="@Model.Title" class="img-fluid"
+                         style="max-width:200px; border-radius:6px; margin-bottom:8px;" />
+
+                    <form asp-action="DeleteImage" method="post" style="margin-top:8px;">
+                        <input type="hidden" name="id" value="@Model.ConcertId" />
+                        <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('Are you sure you want to delete this?');">
+                            Delete Image
+                        </button>
+                    </form>
+
+                </div>
+            }
+
+            @* File upload field *@
+            <div class="mb-3">
+                <label class="control-label">Change Image</label>
+                <input type="file" asp-for="ImageFile" class="form-control" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
+            </div>
+
+            
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Configuration;
+
 
 namespace EventMasters.Controllers
 {
@@ -37,7 +37,7 @@ namespace EventMasters.Controllers
                          .ToList();
 
             ViewBag.NoCategories = !cats.Any();
-            ViewBag.CategoryList = new SelectList(cats, "CategoryId", "Name"); // or "Title" if you use that. this is the little dropdown
+            ViewBag.CategoryList = new SelectList(cats, "CategoryId", "Name"); // this is the little dropdown
         }
 
         // GET: /Concerts
@@ -76,7 +76,7 @@ namespace EventMasters.Controllers
             concert.DateAdded = DateTime.Now;
 
 
-            // If a category was chosen, attach it (no model change needed)
+            // If a category was chosen, attach it
             if (CategoryId.HasValue)
             {
                 var cat = await _context.Category.FindAsync(CategoryId.Value);
@@ -103,18 +103,7 @@ namespace EventMasters.Controllers
                 }
 
                     
-                //    string saveFilePath = Path.Combine(
-                //        Directory.GetCurrentDirectory(), "wwwroot", "photos", filename
-                //    );
-
-                //    // create directory if it doesn’t exist (handy in fresh projects)
-                //    Directory.CreateDirectory(Path.GetDirectoryName(saveFilePath)!);
-
-                //    using (var fileStream = new FileStream(saveFilePath, FileMode.Create))
-                //    {
-                //        await concert.ImageFile.CopyToAsync(fileStream);
-                //    }
-                //}
+               
                 _context.Add(concert);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Home");
@@ -146,56 +135,78 @@ namespace EventMasters.Controllers
             return View(concert);
         }
 
-        // POST: Concerts/Edit/5
-       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category,ImageFile")] Concert concert)
+        public async Task<IActionResult> Edit(int id, [Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category,Filename,ImageFile")] Concert concert)
         {
             if (id != concert.ConcertId)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
-                try
+                var existing = await _context.Concert.AsNoTracking().FirstOrDefaultAsync(c => c.ConcertId == id);
+                if (existing == null)
+                    return NotFound();
+
+                // Handle new image upload
+                if (concert.ImageFile != null)
                 {
-                    _context.Update(concert);
-                    await _context.SaveChangesAsync();
+                    string blobName = Guid.NewGuid().ToString() + "_" + concert.ImageFile.FileName;
+
+                    //blob client for that file
+                    var blobClient = _containerClient.GetBlobClient(blobName);
+
+                    //Upload to Blob
+                    using (var stream = concert.ImageFile.OpenReadStream())
+                    {
+                        await blobClient.UploadAsync(stream, new BlobHttpHeaders { ContentType = concert.ImageFile.ContentType });
+                    }
+                    concert.Filename = blobClient.Uri.ToString();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!ConcertExists(concert.ConcertId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    // If no new file, keep the old filename
+                    concert.Filename = existing.Filename;
                 }
+
+                _context.Update(concert);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction("Index", "Home");
             }
+
             return View(concert);
         }
 
-        public async Task<IActionResult> Details(int? id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteImage(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var concert = await _context.Concert
-                .FirstOrDefaultAsync(m => m.ConcertId == id);
-
+            var concert = await _context.Concert.FindAsync(id);
             if (concert == null)
-            {
                 return NotFound();
+
+            if (!string.IsNullOrEmpty(concert.Filename))
+            {
+                // Extract blob name 
+                var blobUri = new Uri(concert.Filename);
+                var blobName = Uri.UnescapeDataString(blobUri.Segments.Last());
+
+                // Delete blob 
+                var blobClient = _containerClient.GetBlobClient(blobName);
+                var deleted = await blobClient.DeleteIfExistsAsync();
+
+                // Only clear database record if blob was actually deleted
+                if (deleted)
+                {
+                    concert.Filename = null;
+                    _context.Update(concert);
+                    await _context.SaveChangesAsync();
+                }
             }
 
-            return View(concert);
+            // Return to the same Edit view
+            return RedirectToAction("Edit", new { id = concert.ConcertId });
         }
 
         // GET: Concerts/Delete/5
