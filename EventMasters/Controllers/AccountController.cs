@@ -27,7 +27,7 @@ namespace EventMasters.Controllers
         public async Task <IActionResult> Login(string username, string password, string returnUrl)
         {
 
-            if (username == _configuration["username"] && password == _configuration["password"])
+            if (username == _configuration["Myusername"] && password == _configuration["Mypassword"])
             {
                 // Create a list of claims identifying the user
                 var claims = new List<Claim>
