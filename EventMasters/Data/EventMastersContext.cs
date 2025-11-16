@@ -16,5 +16,7 @@ namespace EventMasters.Data
 
         public DbSet<EventMasters.Models.Concert> Concert { get; set; } = default!;
         public DbSet<EventMasters.Models.Category> Category { get; set; } = default!;
+
+        public DbSet<Purchase> Purchase { get; set; } = default!;
     }
 }

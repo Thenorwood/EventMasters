@@ -34,6 +34,8 @@ namespace EventMasters.Models
         [Display(Name = "Image")]
         public IFormFile? ImageFile { get; set; } //nullable, dont need photo
 
+        public ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
+
 
 
     }

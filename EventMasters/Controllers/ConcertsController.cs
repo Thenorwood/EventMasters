@@ -134,7 +134,7 @@ namespace EventMasters.Controllers
             }
             return View(concert);
         }
-
+        // pOST: Concerts
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ConcertId,Title,Description,Location,Owner,DateAdded,EventDate,Category,Filename,ImageFile")] Concert concert)

@@ -45,7 +45,6 @@ namespace EventMasters.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
 
-                // TO-DO: fix bug where returnUrl is null!!!!!!!!
 
                 if (!string.IsNullOrEmpty(returnUrl))
                 {
